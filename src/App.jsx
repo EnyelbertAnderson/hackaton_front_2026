@@ -27,7 +27,7 @@ function App() {
   )
 
   const previews = useMemo(
-    () => files.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    () => files.map((file) => ({ file, url: URL.createObjectURL(file), isPdf: file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf') })),
     [files],
   )
 
@@ -65,7 +65,7 @@ function App() {
   }
 
   const validateEvaluation = () => {
-    if (!files.length) return 'Sube al menos una foto de examen.'
+    if (!files.length) return 'Sube al menos una foto o PDF de examen.'
     if (studentNames.length !== files.length) {
       return `Ingresa ${files.length} estudiante(s), uno por cada foto.`
     }
