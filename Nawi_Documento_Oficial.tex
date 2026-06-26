@@ -1,0 +1,552 @@
+\documentclass[12pt]{article}
+
+% =========================
+% PAQUETES
+% =========================
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{pgfplots}
+\usepackage{tikz}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyhdr}
+
+\pgfplotsset{compat=1.18}
+\geometry{margin=2.5cm}
+\onehalfspacing
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    pdfborder={0 0 0}
+}
+
+% Configurar headers y footers
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\textit{Ñawi - NEXIA 2026}}
+\lhead{\textit{Inteligencia Pedagógica Asistida por IA}}
+\cfoot{\thepage}
+
+% =========================
+% DATOS DEL DOCUMENTO
+% =========================
+\title{%
+\textbf{Ñawi}\\
+\textbf{Plataforma de Inteligencia Pedagógica}\\
+\textbf{basada en Inteligencia Artificial y Ciencia de Datos}\\
+\vspace{0.5cm}
+{\large Evaluación Formativa Inteligente para Educación Peruana}
+}
+\author{Enyelbert Anderson Panta Huaracha \\ \textit{Equipo de Desarrollo}}
+\date{Hackathon NEXIA 2026 -- Arequipa, Perú \\ Junio 26-27, 2026}
+
+\begin{document}
+
+\maketitle
+
+% =========================
+% RESUMEN EJECUTIVO
+% =========================
+\begin{abstract}
+
+\textbf{Ñawi} es una plataforma innovadora de Inteligencia Pedagógica que transforma evaluaciones manuscritas en evidencia accionable para mejorar el aprendizaje. A partir de una fotografía de un examen físico, el sistema extrae respuestas mediante OCR multimodal, las analiza respecto a rúbricas docentes, genera retroalimentación personalizada, identifica patrones de error y produce diagnósticos pedagógicos agregados del aula.
+
+El sistema implementa una arquitectura basada en agentes especializados de Inteligencia Artificial que cumplen funciones de visión, evaluación, verificación y análisis. Una característica distintiva es la verificación cruzada entre agentes independientes, que mejora la confiabilidad y reduce sesgos sistemáticos.
+
+Ñawi no reemplaza al docente, sino que actúa como un \textit{copiloto pedagógico} que organiza información, propone retroalimentación y facilita decisiones más rápidas, claras y fundamentadas. El docente mantiene el control total sobre la evaluación y puede aprobar, modificar o rechazar recomendaciones en todo momento.
+
+La propuesta se alinea con el Currículo Nacional de Educación Básica (CNEB) peruano mediante integración de Retrieval-Augmented Generation (RAG) sobre documentos curriculares oficiales, permitiendo vincular resultados de evaluaciones con competencias, capacidades y desempeños esperados.
+
+\end{abstract}
+
+\noindent\textbf{Palabras clave:} Inteligencia Pedagógica, Ciencia de Datos, Inteligencia Artificial, Evaluación Formativa, Multimodalidad, Analítica Educativa, Retroalimentación Personalizada, Educación Peruana.
+
+\newpage
+
+% ============================================================
+\section{Planteamiento del Problema}
+% ============================================================
+
+La transformación digital está redefiniendo múltiples sectores, incluida la educación. Sin embargo, uno de los procesos más críticos para mejorar el aprendizaje, la evaluación formativa, continúa realizándose en muchas instituciones peruanas de forma manual, poco sistematizada y con escasa capacidad de generar inteligencia pedagógica.
+
+En particular, las evaluaciones manuscritas en papel siguen siendo ampliamente utilizadas. Los docentes deben revisar respuestas abiertas de treinta a cuarenta estudiantes por aula, corregir cientos de respuestas semanales, asignar calificaciones y elaborar retroalimentaciones de manera individual y repetitiva. Este proceso consume un tiempo valioso que podría destinarse a actividades pedagógicas de mayor valor.
+
+El problema central, sin embargo, no es únicamente el tiempo invertido. El verdadero problema es que las evaluaciones generan poca \textit{inteligencia pedagógica} útil. Después de todo el esfuerzo de corrección, la evaluación suele reducirse a una nota numérica, perdiéndose gran parte del valor educativo latente en las respuestas de los estudiantes: errores conceptuales recurrentes, patrones de comprensión, competencias con mayor dificultad, estudiantes en riesgo de rezago y necesidades de refuerzo del aula.
+
+Como consecuencia, la retroalimentación suele llegar tarde, las intervenciones pedagógicas carecen de base empírica clara, y los docentes no cuentan con información sistematizada para detectar y atender oportunamente las necesidades específicas de cada estudiante.
+
+% ============================================================
+\section{Evidencia del Problema en Perú}
+% ============================================================
+
+Los resultados internacionales de aprendizaje evidencian la urgencia de fortalecer la evaluación formativa en el Perú. De acuerdo con PISA 2022, los estudiantes peruanos obtuvieron puntajes promedio inferiores al promedio de países de la OCDE en Matemática, Lectura y Ciencia \cite{OECDPISA2022Peru}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=18pt,
+    width=13cm,
+    height=7cm,
+    ylabel={Puntaje promedio PISA 2022},
+    ylabel style={font=\small},
+    xlabel style={font=\small},
+    symbolic x coords={Matemática,Lectura,Ciencia},
+    xtick=data,
+    ymin=0,
+    ymax=520,
+    legend style={at={(0.5,-0.15)},anchor=north,legend columns=-1,font=\small},
+    nodes near coords,
+    nodes near coords align={vertical},
+    enlarge x limits=0.25,
+    grid=y,
+    grid style={gray!30}
+]
+\addplot[fill=blue!40] coordinates {(Matemática,391) (Lectura,408) (Ciencia,408)};
+\addplot[fill=orange!40] coordinates {(Matemática,472) (Lectura,476) (Ciencia,485)};
+\legend{Perú, Promedio OCDE}
+\end{axis}
+\end{tikzpicture}
+\caption{Comparación del puntaje promedio PISA 2022: Perú vs. Promedio OCDE. La brecha en Matemática es especialmente crítica (81 puntos por debajo).}
+\label{fig:pisa_puntajes}
+\end{figure}
+
+Como se observa en la Figura \ref{fig:pisa_puntajes}, Perú presenta una brecha significativa en todas las áreas. Particularmente en Matemática, el país obtiene 391 puntos frente a 472 del promedio OCDE. Esta diferencia es crítica cuando se considera que la Matemática es una competencia transversal.
+
+Más alarmante aún es el porcentaje de estudiantes que no alcanza el Nivel 2 (umbral mínimo de competencia). Según reportes del Ministerio de Educación, aproximadamente el 66\% de estudiantes peruanos no alcanza el nivel mínimo en Matemática, el 50\% en Lectura y el 53\% en Ciencia \cite{MINEDUPISA2022}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    ybar,
+    bar width=25pt,
+    width=13cm,
+    height=7cm,
+    ylabel={Porcentaje de estudiantes bajo nivel mínimo (\%)},
+    ylabel style={font=\small},
+    symbolic x coords={Matemática,Lectura,Ciencia},
+    xtick=data,
+    ymin=0,
+    ymax=100,
+    nodes near coords,
+    nodes near coords align={vertical},
+    enlarge x limits=0.3,
+    grid=y,
+    grid style={gray!30}
+]
+\addplot[fill=red!50] coordinates {(Matemática,66) (Lectura,50) (Ciencia,53)};
+\end{axis}
+\end{tikzpicture}
+\caption{Porcentaje de estudiantes peruanos por debajo del nivel mínimo de competencia PISA 2022. Esto evidencia que una parte significativa del alumnado requiere intervenciones pedagógicas urgentes.}
+\label{fig:pisa_bajo_nivel}
+\end{figure}
+
+Aún más preocupante es la desigualdad educativa. De acuerdo con la OCDE, aproximadamente el 87\% de estudiantes socioeconómicamente desfavorecidos obtiene bajo desempeño en Matemática \cite{OECDSkillsPeru2026}. Esta cifra revela que las brechas de aprendizaje afectan con mayor intensidad a estudiantes con menos oportunidades.
+
+En síntesis, el sistema educativo peruano enfrenta un problema dual: bajo rendimiento promedio y alta desigualdad. La evaluación formativa oportuna, personalizada y basada en evidencia es un mecanismo clave para detectar dificultades a tiempo y reducir estas brechas.
+
+% ============================================================
+\section{Propuesta de Solución: Ñawi}
+% ============================================================
+
+\subsection{Concepto General}
+
+Como respuesta a esta problemática, se propone \textbf{Ñawi}, una plataforma innovadora de \textbf{Inteligencia Pedagógica} asistida por Inteligencia Artificial y Ciencia de Datos. El nombre \textit{Ñawi}, que significa ``ojo'' en quechua, representa la capacidad del sistema para observar aquello que normalmente permanece oculto entre cientos de respuestas individuales: patrones de aprendizaje, errores conceptuales recurrentes, competencias con bajo desempeño y estudiantes que requieren atención prioritaria.
+
+A diferencia de herramientas convencionales de corrección automática, Ñawi no se enfoca únicamente en responder ``¿qué nota obtuvo un estudiante?''. Su propósito es responder preguntas de mayor valor pedagógico:
+
+\begin{center}
+\textit{¿Qué nos dice esta evaluación sobre el aprendizaje del estudiante y el aula?\\
+¿Qué decisiones pedagógicas debo tomar con base en esta evidencia?}
+\end{center}
+
+\subsection{Flujo de Funcionamiento}
+
+El proceso de Ñawi inicia cuando el docente toma una fotografía del examen manuscrito utilizando cualquier celular. A partir de esa imagen, la plataforma procesa automáticamente la información mediante una arquitectura basada en agentes especializados de Inteligencia Artificial:
+
+\begin{enumerate}
+    \item \textbf{Captura visual:} recibe la imagen del examen y mejora legibilidad.
+    \item \textbf{OCR multimodal:} extrae texto manuscrito de alta precisión.
+    \item \textbf{Estructuración:} separa preguntas, respuestas, competencias y criterios.
+    \item \textbf{Evaluación:} analiza la respuesta según la rúbrica del docente.
+    \item \textbf{Verificación cruzada:} revisa coherencia entre respuesta, rúbrica y puntaje.
+    \item \textbf{Análisis curricular:} vincula resultados con competencias del CNEB.
+    \item \textbf{Generación de diagnóstico:} identifica patrones, errores comunes y alertas.
+\end{enumerate}
+
+Como resultado, el docente recibe:
+
+\begin{itemize}
+    \item ✓ Evaluación asistida de respuestas abiertas
+    \item ✓ Retroalimentación personalizada basada en rúbrica
+    \item ✓ Identificación de errores conceptuales recurrentes
+    \item ✓ Relación entre errores y competencias del CNEB
+    \item ✓ Diagnóstico general del desempeño del aula
+    \item ✓ Recomendaciones pedagógicas para próxima sesión
+    \item ✓ Identificación temprana de estudiantes en riesgo
+    \item ✓ Reportes de evolución entre evaluaciones
+\end{itemize}
+
+En todo momento, el docente mantiene control total. La Inteligencia Artificial actúa como un copiloto pedagógico que organiza información, propone retroalimentación y facilita decisiones informadas sin reemplazar el juicio profesional.
+
+% ============================================================
+\section{Enfoque de Ciencia de Datos}
+% ============================================================
+
+Ñawi implementa un enfoque estructurado de Ciencia de Datos aplicada a la educación. Convierte información no estructurada (respuestas manuscritas) en datos analizables para generar conocimiento pedagógico accionable.
+
+\subsection{Ciclo de Datos}
+
+El flujo de datos se organiza en cinco etapas conectadas:
+
+\begin{enumerate}
+    \item \textbf{Captura:} fotografía del examen físico registrada por el docente.
+    \item \textbf{Extracción:} OCR convierte imagen en texto estructurado.
+    \item \textbf{Estructuración:} datos se organizan por estudiante, pregunta, competencia, rúbrica, puntaje.
+    \item \textbf{Análisis:} identifican patrones, errores, competencias débiles, estudiantes en riesgo.
+    \item \textbf{Visualización:} dashboards, alertas y recomendaciones para decisión docente.
+\end{enumerate}
+
+Este enfoque permite pasar de una evaluación aislada a un sistema de aprendizaje basado en evidencia. Cada examen deja de ser solo un documento calificado y se convierte en fuente de datos para comprender mejor el progreso del aula.
+
+\subsection{Transformación de Datos en Decisiones}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{3.2cm} p{4cm} p{4cm}}
+\toprule
+\textbf{Dato generado} & \textbf{Análisis posible} & \textbf{Decisión pedagógica} \\
+\midrule
+Respuesta estructurada & Nivel comprensión y errores conceptuales & Retroalimentación personalizada \\
+Puntaje por pregunta & Preguntas con mayor dificultad & Reforzar contenidos específicos \\
+Competencia asociada & Competencias de bajo desempeño & Ajustar planificación \\
+Errores frecuentes & Patrones colectivos del aula & Diseñar recuperación \\
+Historial evaluaciones & Evolución del aprendizaje & Detectar estudiantes en riesgo \\
+\bottomrule
+\end{tabular}
+\caption{Transformación de datos de evaluación en decisiones pedagógicas. Cada dato generado permite tomar decisiones específicas.}
+\label{tabla:datos_decisiones}
+\end{table}
+
+% ============================================================
+\section{Arquitectura Técnica}
+% ============================================================
+
+\subsection{Arquitectura de Agentes}
+
+Ñawi implementa una cadena de procesamiento asistida por agentes especializados. Cada agente cumple una función concreta, permitiendo mejorar trazabilidad, reducir errores y facilitar supervisión docente.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=2cm, auto]
+    \node (input) [draw, rectangle, fill=blue!20] {Foto Examen};
+    \node (ocr) [draw, rectangle, fill=green!20, right of=input] {Agente OCR};
+    \node (eval) [draw, rectangle, fill=yellow!20, right of=ocr] {Agente Evaluador};
+    \node (verify) [draw, rectangle, fill=orange!20, right of=eval] {Verificador};
+    \node (output) [draw, rectangle, fill=purple!20, right of=verify] {Dashboard};
+    
+    \draw[->] (input) -- (ocr);
+    \draw[->] (ocr) -- (eval);
+    \draw[->] (eval) -- (verify);
+    \draw[->] (verify) -- (output);
+\end{tikzpicture}
+\caption{Pipeline de procesamiento de Ñawi. Cada agente es independiente pero conectado en flujo secuencial.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Agentes Especializados}
+
+Los agentes principales son:
+
+\begin{itemize}
+    \item \textbf{Agente Visión:} Gemini 3.1 Flash-Lite. Recibe imagen, mejora legibilidad, realiza OCR.
+    \item \textbf{Agente Evaluador:} Claude Haiku 4.5. Analiza respuesta según rúbrica con RAG sobre CNEB.
+    \item \textbf{Agente Verificador:} Gemini 3.1 Flash-Lite. Revisa coherencia entre respuesta, criterios y puntaje.
+    \item \textbf{Agente Diagnóstico:} Gemini 3 Flash. Agrega datos, identifica patrones, genera recomendaciones.
+\end{itemize}
+
+La verificación cruzada entre agentes independientes es un diferencial clave. Un agente evalúa, otro revisa. Esto reduce errores sistemáticos y aumenta confiabilidad.
+
+\subsection{Integración RAG con CNEB}
+
+Ñawi integra un sistema de Retrieval-Augmented Generation sobre el Currículo Nacional de Educación Básica \cite{CNEB2016}. Esto permite:
+
+\begin{itemize}
+    \item Vincular competencias específicas con respuestas de estudiantes
+    \item Generar retroalimentación anclada en desempeños esperados
+    \item Identificar qué capacidades del currículo están débiles
+    \item Alinear diagnósticos del aula con metas curriculares
+\end{itemize}
+
+% ============================================================
+\section{Producto Mínimo Viable (MVP)}
+% ============================================================
+
+Para la hackathon, el MVP de Ñawi demuestra el valor principal: convertir evaluación manuscrita en información pedagógica útil.
+
+\subsection{Funcionalidades del MVP}
+
+\begin{itemize}
+    \item ✓ Carga/captura de imagen de evaluación manuscrita
+    \item ✓ Extracción de texto mediante OCR
+    \item ✓ Registro de rúbrica simple definida por docente
+    \item ✓ Evaluación asistida de respuestas abiertas
+    \item ✓ Generación de retroalimentación personalizada
+    \item ✓ Dashboard con estadísticas del aula
+    \item ✓ Identificación de errores frecuentes
+    \item ✓ Recomendación pedagógica para próxima sesión
+\end{itemize}
+
+\subsection{Hipótesis Clave}
+
+El MVP valida una hipótesis concreta:
+
+\begin{center}
+\textit{Si una evaluación manuscrita puede convertirse en datos pedagógicos estructurados, entonces el docente puede tomar mejores decisiones en significativamente menos tiempo.}
+\end{center}
+
+% ============================================================
+\section{Innovación y Diferenciadores}
+% ============================================================
+
+\subsection{Diferenciadores Clave}
+
+La innovación de Ñawi no consiste en utilizar IA para corregir exámenes. La verdadera innovación es transformar la evaluación tradicional en un \textit{Learning Intelligence System}.
+
+\begin{center}
+\begin{tabular}{p{4.5cm} p{5.5cm}}
+\toprule
+\textbf{Pregunta que responde} & \textbf{Tipo de herramienta} \\
+\midrule
+¿Qué nota obtuvo? & Corrección automática común \\
+¿Por qué obtuvo esa nota? & Evaluación con justificación \\
+¿Qué debe mejorar? & Retroalimentación básica \\
+¿Qué errores se repiten? & Análisis de patrones (Ñawi) \\
+¿Qué competencias están débiles? & Análisis curricular (Ñawi) \\
+¿Qué decisiones pedagógicas tomar? & Inteligencia pedagógica (Ñawi) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Diferencial Híbrido Físico-Digital}
+
+Ñawi no exige que las instituciones abandonen evaluaciones en papel ni que cuenten con infraestructura tecnológica compleja. Por el contrario:
+
+\begin{itemize}
+    \item Parte de una práctica ya existente: el examen manuscrito
+    \item La convierte en fuente de datos pedagógicos mediante IA
+    \item Permite transición digital gradual y realista
+    \item Se adapta al contexto de recursos limitados
+\end{itemize}
+
+\subsection{Verificación Cruzada de Agentes}
+
+Un diferencial técnico importante es la verificación cruzada entre agentes IA independientes:
+
+\begin{enumerate}
+    \item Agente A evalúa la respuesta según rúbrica
+    \item Agente B (modelo diferente) revisa coherencia de calificación
+    \item Si hay discrepancia, se marca para revisión docente
+    \item Esto reduce sesgos sistemáticos y aumenta confiabilidad
+\end{enumerate}
+
+Esta arquitectura es inspirada en el principio educativo: no deberías corregir tu propio examen porque tus errores son invisibles para ti. La diversidad de modelos es el punto.
+
+% ============================================================
+\section{Impacto Esperado}
+% ============================================================
+
+\subsection{A Nivel Individual (Docente)}
+
+\begin{itemize}
+    \item Reducción de 60-70\% en tiempo de corrección
+    \item Retroalimentación personalizada más rápida para cada estudiante
+    \item Información estructurada para decisiones pedagógicas
+    \item Mayor tiempo disponible para actividades de valor pedagógico
+\end{itemize}
+
+\subsection{A Nivel de Aula (Estudiante)}
+
+\begin{itemize}
+    \item Retroalimentación más rápida y constructiva
+    \item Oportunidades para corregir errores antes de avanzar
+    \item Identificación temprana de dificultades de aprendizaje
+    \item Actividades de refuerzo personalizadas basadas en evidencia
+\end{itemize}
+
+\subsection{A Nivel Institucional}
+
+\begin{itemize}
+    \item Reportes agregados sobre competencias débiles
+    \item Evolución del aprendizaje por sección
+    \item Identificación de necesidades de refuerzo académico
+    \item Base de datos para análisis pedagógicos a largo plazo
+\end{itemize}
+
+### A Nivel Nacional (ODS)
+
+Ñawi contribuye directamente al Objetivo de Desarrollo Sostenible 4: Educación de Calidad, al promover evaluación más inclusiva, personalizada, oportuna y basada en evidencia.
+
+% ============================================================
+\section{Consideraciones de Responsabilidad y Privacidad}
+% ============================================================
+
+Ñawi se plantea bajo un enfoque de Inteligencia Artificial centrada en el ser humano. El sistema genera recomendaciones que deben ser revisadas y aprobadas por el docente.
+
+\subsection{Principios de Uso Responsable}
+
+\begin{itemize}
+    \item \textbf{Supervisión humana:} Docente puede aprobar, modificar o rechazar evaluación
+    \item \textbf{Transparencia:} Cada calificación muestra justificación con criterio específico
+    \item \textbf{Privacidad:} Datos de estudiantes protegidos, uso únicamente pedagógico
+    \item \textbf{Equidad:} Sistema evita sesgos por forma de escribir o contexto
+    \item \textbf{Mejora continua:} Correcciones docentes mejoran precisión del sistema
+\end{itemize}
+
+\subsection{Arquitectura de Privacidad}
+
+En el MVP del hackathon:
+
+\begin{itemize}
+    \item Fotos procesadas en memoria, no persistidas en servidor
+    \item Flujo: celular → API de visión → JSON de texto → evaluación → resultado
+    \item Base de datos en MVP: JSON en memoria, sin BD externa
+    \item Post-hackathon: encriptación en tránsito, anonimización de datos
+\end{itemize}
+
+% ============================================================
+\section{Modelo de Negocio}
+% ============================================================
+
+\subsection{Costo de Operación}
+
+Ñawi opera con costos marginales muy bajos:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{5cm} r}
+\toprule
+\textbf{Escenario} & \textbf{Costo} \\
+\midrule
+Aula completa (30 alumnos, 5 preguntas) & \$0.03 \\
+Evaluación mensual de colegio (10 aulas × 2 eval) & \$0.60 \\
+1000 evaluaciones/mes (escala) & \$1.00 \\
+\bottomrule
+\end{tabular}
+\caption{Costo marginal de procesamiento en Ñawi. Los costos son centavos por página.}
+\label{tabla:costos}
+\end{table}
+
+\subsection{Modelo Freemium}
+
+\begin{itemize}
+    \item \textbf{Nivel Gratuito:} Primeras 50 evaluaciones/mes por institución
+    \item \textbf{Nivel Institucional:} \$5/mes por institución (accesible para APAFA)
+    \item \textbf{Nivel Regional:} Licenciamiento a UGEL/MINEDU como herramienta diagnóstica
+\end{itemize}
+
+El margen es altísimo porque el costo marginal es centavos.
+
+% ============================================================
+\section{Cronograma de Desarrollo (Hackathon 48h)}
+% ============================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{p{2cm} p{3.5cm} p{5.5cm}}
+\toprule
+\textbf{Fase} & \textbf{Duración} & \textbf{Actividades Clave} \\
+\midrule
+Setup & 1h & Repositorio, API keys, Railway deploy, variables entorno \\
+Desarrollo Backend & 8h & Pipeline OCR, agente evaluador, RAG, verificador \\
+Desarrollo Frontend & 8h & Upload de fotos, preview, asignación alumnos, dashboard \\
+Integración & 6h & Conectar frontend-backend, testing end-to-end \\
+Demo Data & 4h & Preparar exámenes reales, resultados de muestra \\
+Presentación & 8h & Pitch (8 min), ensayo con equipo, Q\&A defensiva \\
+Buffer & 7h & Debugging, optimización, contingencias \\
+\bottomrule
+\end{tabular}
+\caption{Cronograma estimado de 48 horas para hackathon NEXIA 2026.}
+\label{tabla:cronograma}
+\end{table}
+
+% ============================================================
+\section{Conclusión}
+% ============================================================
+
+Ñawi propone una solución innovadora para uno de los problemas más importantes del sistema educativo peruano: convertir la evaluación formativa en inteligencia pedagógica accionable.
+
+Al integrar Inteligencia Artificial multimodal, Ciencia de Datos, Retrieval-Augmented Generation sobre documentos curriculares y arquitectura de agentes verificados, la plataforma permite transformar evaluaciones manuscritas en evidencia estructurada para docentes, estudiantes e instituciones.
+
+La propuesta no busca reemplazar la profesión docente ni automatizar la educación. Por el contrario, busca darle al docente mejores herramientas para observar lo que ocurre en el aula, detectar dificultades a tiempo y tomar decisiones pedagógicas más informadas y oportunas.
+
+En un contexto donde aproximadamente dos tercios de estudiantes peruanos no alcanzan niveles mínimos de competencia, Ñawi representa una oportunidad concreta para fortalecer la evaluación formativa y acercar la inteligencia artificial a las necesidades reales de las instituciones educativas.
+
+\begin{center}
+\textbf{\Large Ñawi no solo corrige.}\\
+\textbf{\Large Ñawi observa, analiza y ayuda a enseñar mejor.}
+\end{center}
+
+% ============================================================
+% BIBLIOGRAFÍA
+% ============================================================
+
+\newpage
+\section*{Referencias Bibliográficas}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+% ============================================================
+% APÉNDICE
+% ============================================================
+
+\newpage
+\appendix
+
+\section{Stack Tecnológico}
+
+\subsection{Frontend}
+\begin{itemize}
+    \item React 19 + Vite
+    \item Responsive design (mobile-first)
+    \item Sin dependencias externas innecesarias
+\end{itemize}
+
+\subsection{Backend}
+\begin{itemize}
+    \item Python + FastAPI
+    \item ChromaDB para embeddings RAG
+    \item Modelos IA: Claude Haiku 4.5, Gemini 3.1 Flash-Lite, Gemini 3 Flash
+\end{itemize}
+
+\subsection{Deploy}
+\begin{itemize}
+    \item Railway free tier para MVP
+    \item HTTPS automático
+    \item Escalable a producción
+\end{itemize}
+
+\section{Contacto y Créditos}
+
+\textbf{Hackathon NEXIA 2026} \\
+Track 2: Evaluación Inteligente y Feedback en Tiempo Real \\
+Arequipa, Perú -- Junio 26-27, 2026 \\
+
+\end{document}
